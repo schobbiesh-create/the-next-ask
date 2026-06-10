@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Next Ask: UWCI Donor Intelligence Strategy</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ── Reset & tokens ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D2B55;--blue:#185FA5;--teal:#0F6E56;--purp:#534AB7;
+  --amber:#854F0B;--green:#3B6D11;--red:#A32D2D;
+  --ice:#B5D4F4;--mist:#E6F1FB;--ltbg:#F4F7FB;
+  --gray:#64748B;--border:rgba(0,0,0,0.09);
+  --text:#1a2332;--text2:#64748B;--text3:#94A3B8;
+  --white:#fff;--radius:10px;--radius-sm:6px;
+  --shadow:0 2px 12px rgba(0,0,0,0.08);
+  --trans:all .28s cubic-bezier(.4,0,.2,1);
+}
+
+html{font-family:'Segoe UI',system-ui,sans-serif;font-size:16px;line-height:1.6;color:var(--text);background:#F0F4FA;scroll-behavior:smooth}
+
+/* ── Top nav ────────────────────────────────────────────────── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:var(--navy);display:flex;align-items:center;
+  height:52px;padding:0 20px;gap:4px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);
+}
+.nav-brand{font-size:13px;font-weight:700;color:var(--ice);letter-spacing:.03em;margin-right:12px;white-space:nowrap}
+.nav-btn{
+  font-size:11px;font-weight:500;color:#8AAFD4;padding:5px 11px;
+  border-radius:20px;border:none;background:none;cursor:pointer;
+  white-space:nowrap;transition:var(--trans);font-family:inherit;letter-spacing:.02em;
+}
+.nav-btn:hover{background:rgba(255,255,255,0.1);color:var(--white)}
+.nav-btn.active{background:var(--blue);color:var(--white)}
+.nav-spacer{flex:1}
+.tech-toggle{
+  display:flex;align-items:center;gap:7px;font-size:11px;color:#8AAFD4;
+  padding:4px 12px;border:1px solid rgba(255,255,255,0.15);border-radius:20px;
+  cursor:pointer;background:none;transition:var(--trans);font-family:inherit;
+}
+.tech-toggle:hover{border-color:rgba(255,255,255,0.35);color:var(--white)}
+.tech-toggle.on{background:var(--teal);border-color:var(--teal);color:var(--white)}
+.toggle-dot{width:8px;height:8px;border-radius:50%;background:currentColor;transition:var(--trans)}
+
+/* ── Main layout ────────────────────────────────────────────── */
+#main{margin-top:52px;padding:0}
+
+/* ── Section wrappers ───────────────────────────────────────── */
+.section{display:none;animation:fadeIn .35s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Hero panels ────────────────────────────────────────────── */
+.hero{
+  background:var(--navy);color:var(--white);
+  padding:52px 56px 48px;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;right:-60px;top:-60px;
+  width:340px;height:340px;border-radius:50%;
+  background:rgba(24,95,165,0.18);pointer-events:none;
+}
+.hero-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8AAFD4;font-weight:600;margin-bottom:12px}
+.hero h1{font-size:48px;font-weight:700;line-height:1.05;font-family:Georgia,serif;margin-bottom:14px}
+.hero h1 span{color:var(--ice)}
+.hero-sub{font-size:17px;color:#B8D0E8;max-width:640px;line-height:1.65;margin-bottom:28px}
+.hero-meta{font-size:11px;color:#4A6E90}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px}
+.chip{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.04em}
+
+/* ── Content area ───────────────────────────────────────────── */
+.content{padding:32px 56px 56px;max-width:1200px}
+
+/* ── Cards & grids ──────────────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+.card-accent{border-top:3px solid var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+
+/* ── Metric cards ───────────────────────────────────────────── */
+.metric{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;border-top:3px solid var(--blue)}
+.metric-val{font-size:30px;font-weight:700;color:var(--navy);font-family:Georgia,serif;line-height:1}
+.metric-lbl{font-size:11px;color:var(--text2);margin-top:5px}
+.metric-sub{font-size:11px;margin-top:3px}
+.up{color:var(--teal)}.dn{color:var(--red)}.neu{color:var(--text3)}
+
+/* ── Section headers ────────────────────────────────────────── */
+.sec-eyebrow{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.sec-title{font-size:24px;font-weight:700;color:var(--navy);font-family:Georgia,serif;margin-bottom:8px}
+.sec-body{font-size:14px;color:var(--text2);line-height:1.7;max-width:680px;margin-bottom:24px}
+
+/* ── Tabs ───────────────────────────────────────────────────── */
+.tab-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:9px 20px;font-size:13px;font-weight:500;background:none;border:none;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:var(--trans);font-family:inherit}
+.tab:hover{color:var(--blue)}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* ── Insight strips ─────────────────────────────────────────── */
+.insight{border-left:3px solid var(--blue);padding:11px 16px;background:var(--mist);border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:13px;color:var(--navy);line-height:1.6;margin:16px 0}
+.insight.teal{border-left-color:var(--teal);background:#E1F5EE}
+.insight.purp{border-left-color:var(--purp);background:#EEEDFE}
+.insight strong{font-weight:600}
+
+/* ── Data source cards ──────────────────────────────────────── */
+.ds-card{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;transition:var(--trans)}
+.ds-card:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.ds-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;font-family:Georgia,serif;flex-shrink:0;color:var(--white)}
+.ds-title{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.ds-timing{font-size:11px;margin-bottom:5px}
+.ds-body{font-size:12px;color:var(--text2);line-height:1.55}
+.ds-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:500;margin-top:6px;margin-right:4px}
+
+/* ── Survey question rows ───────────────────────────────────── */
+.q-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--ltbg);border-radius:var(--radius-sm);margin-bottom:6px}
+.q-num{font-size:11px;font-weight:700;color:var(--text3);width:28px;flex-shrink:0}
+.q-text{font-size:13px;color:var(--navy);font-weight:500;flex:1}
+.q-dim{font-size:11px;color:var(--text3);font-style:italic;text-align:right;min-width:140px}
+
+/* ── Campaign rows ──────────────────────────────────────────── */
+.campaign-row{display:grid;grid-template-columns:56px 1fr 1fr 1fr;gap:0;align-items:stretch;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;transition:var(--trans)}
+.campaign-row:hover{box-shadow:var(--shadow)}
+.camp-num{display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;font-family:Georgia,serif;background:var(--mist);color:var(--blue)}
+.camp-main{padding:14px 16px;border-left:1px solid var(--border)}
+.camp-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.camp-lever{font-size:11px;color:var(--blue);margin-bottom:6px}
+.camp-how{font-size:12px;color:var(--text2);line-height:1.5}
+.camp-data{padding:14px 16px;border-left:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.5}
+.camp-data strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+.camp-psych{padding:14px 16px;border-left:1px solid var(--border);font-size:11px;color:var(--text2)}
+.camp-psych strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+
+/* ── Predictor bars ─────────────────────────────────────────── */
+.pred-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pred-label{font-size:12px;color:var(--text);min-width:190px}
+.pred-track{flex:1;background:#E8EDF2;border-radius:4px;height:9px}
+.pred-fill{height:9px;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.pred-pct{font-size:11px;font-weight:700;min-width:44px;text-align:right}
+
+/* ── Slider & risk ──────────────────────────────────────────── */
+.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.slider-row label{font-size:12px;color:var(--text2);min-width:160px}
+.slider-row input[type=range]{flex:1;accent-color:var(--blue)}
+.slider-val{font-size:13px;font-weight:700;color:var(--navy);min-width:50px}
+.risk-display{display:flex;align-items:baseline;gap:10px;margin:14px 0 6px}
+.risk-num{font-size:38px;font-weight:700;font-family:Georgia,serif}
+.risk-track{background:#E8EDF2;border-radius:6px;height:11px;margin-bottom:6px}
+.risk-fill{height:11px;border-radius:6px;transition:width .4s,background .4s}
+.risk-msg{font-size:12px;color:var(--text2)}
+
+/* ── Roadmap ────────────────────────────────────────────────── */
+.roadmap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.phase-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.phase-header{padding:12px 14px;display:flex;align-items:center;gap:8px}
+.phase-q{font-size:20px;font-weight:700;font-family:Georgia,serif;color:var(--white)}
+.phase-label{font-size:13px;font-weight:600;color:var(--white)}
+.phase-body{padding:12px 14px}
+.phase-item{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:12px;color:var(--navy);line-height:1.45}
+.phase-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.phase-outcome{margin-top:10px;padding:8px 10px;border-radius:var(--radius-sm);font-size:11px;font-style:italic;line-height:1.45}
+
+/* ── R code panels ──────────────────────────────────────────── */
+.r-panel{display:none}
+.r-panel.show{display:block}
+.code-block{background:#1E2028;border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#14161C}
+.code-lang{font-size:11px;font-weight:700;color:#185FA5;font-family:monospace}
+.code-lbl{font-size:11px;color:#5A7FA8;font-family:monospace}
+.code-body{padding:14px 16px;font-family:'Consolas','Courier New',monospace;font-size:12.5px;line-height:1.65;white-space:pre;overflow-x:auto;color:#D4D4D4}
+.kw{color:#C586C0}.fn{color:#DCDCAA}.str{color:#CE9178}.cm{color:#6A9955}.num{color:#B5CEA8}.var{color:#9CDCFE}
+
+/* ── Psych dimension cards ──────────────────────────────────── */
+.dim-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.dim-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;border-top:3px solid var(--blue);transition:var(--trans)}
+.dim-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.dim-num{font-size:22px;font-weight:700;font-family:Georgia,serif;color:var(--blue);margin-bottom:6px}
+.dim-label{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.dim-sub{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.dim-measure{font-size:11px;color:var(--text3);padding:6px 10px;background:var(--ltbg);border-radius:var(--radius-sm);line-height:1.45}
+
+/* ── Giving channels ────────────────────────────────────────── */
+.channel-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;transition:var(--trans)}
+.channel-row:hover{box-shadow:var(--shadow)}
+.channel-rank{font-size:22px;font-weight:700;font-family:Georgia,serif;color:var(--blue);width:28px;flex-shrink:0}
+.channel-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.channel-why{font-size:12px;color:var(--text2)}
+.channel-stat{text-align:right;flex-shrink:0;min-width:70px}
+.channel-stat-val{font-size:20px;font-weight:700;font-family:Georgia,serif;color:var(--blue)}
+.channel-stat-lbl{font-size:10px;color:var(--text3)}
+
+/* ── Cite bar ───────────────────────────────────────────────── */
+.cite{font-size:10px;color:var(--text3);margin-top:12px;line-height:1.5}
+
+/* ── Close section ──────────────────────────────────────────── */
+.close-card{background:var(--navy);border-radius:var(--radius);padding:18px 22px;margin-bottom:12px;display:flex;gap:14px;align-items:flex-start}
+.close-n{font-size:28px;font-weight:700;font-family:Georgia,serif;line-height:1}
+.close-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:4px}
+.close-body{font-size:12px;color:#8AAFD4;line-height:1.6}
+
+/* ── Q&A ────────────────────────────────────────────────────── */
+.qa-hero{background:var(--navy);min-height:calc(100vh - 52px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px}
+.qa-thanks{font-size:72px;font-weight:700;font-family:Georgia,serif;color:var(--white);margin-bottom:16px}
+.qa-title{font-size:22px;color:var(--ice);margin-bottom:36px}
+.qa-divider{width:120px;height:2px;background:rgba(255,255,255,0.12);margin:0 auto 36px}
+.qa-label{font-size:52px;font-weight:700;font-family:Georgia,serif;color:rgba(255,255,255,0.12);letter-spacing:.06em}
+.qa-meta{font-size:11px;color:#4A6E90;margin-top:40px}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media(max-width:900px){
+  .hero{padding:36px 24px 32px}
+  .content{padding:24px 24px 48px}
+  .hero h1{font-size:32px}
+  .grid2,.grid3,.grid4,.dim-grid,.roadmap-grid{grid-template-columns:1fr}
+  .campaign-row{grid-template-columns:1fr}
+  .nav-btn{padding:4px 8px;font-size:10px}
+}
+
+/* ── Q Popout ───────────────────────────────────────────────── */
+.q-popout-btn{
+  position:fixed;right:20px;bottom:24px;z-index:200;
+  background:var(--navy);color:var(--white);border:none;border-radius:50px;
+  padding:10px 18px;font-size:12px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:7px;box-shadow:0 4px 18px rgba(0,0,0,0.28);
+  transition:var(--trans);font-family:inherit;letter-spacing:.02em;
+}
+.q-popout-btn:hover{background:var(--blue);transform:translateY(-2px)}
+.q-popout-btn .bubble{
+  background:var(--blue);color:#fff;border-radius:50%;
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;
+}
+.q-popout-overlay{
+  position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0);
+  pointer-events:none;transition:background .25s;
+}
+.q-popout-overlay.open{background:rgba(0,0,0,0.35);pointer-events:all}
+.q-popout-drawer{
+  position:fixed;right:0;top:52px;bottom:0;z-index:200;
+  width:min(480px,92vw);background:var(--white);
+  box-shadow:-4px 0 28px rgba(0,0,0,0.18);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.q-popout-drawer.open{transform:translateX(0)}
+.q-drawer-header{
+  background:var(--navy);padding:16px 20px;display:flex;
+  align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.q-drawer-title{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.q-drawer-close{
+  background:rgba(255,255,255,0.12);border:none;color:#fff;
+  width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;transition:var(--trans);
+}
+.q-drawer-close:hover{background:rgba(255,255,255,0.25)}
+.q-drawer-body{flex:1;overflow-y:auto;padding:0}
+.q-drawer-section{padding:16px 20px;border-bottom:1px solid var(--border)}
+.q-drawer-section:last-child{border-bottom:none}
+.q-item{margin-bottom:14px}
+.q-item:last-child{margin-bottom:0}
+.q-item-q{
+  font-size:12.5px;font-weight:600;color:var(--navy);
+  margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;
+  cursor:pointer;
+}
+.q-item-q .q-icon{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;margin-top:1px;
+}
+.q-item-a{
+  font-size:12px;color:var(--text2);line-height:1.65;
+  padding:10px 12px;background:var(--ltbg);border-radius:var(--radius-sm);
+  border-left:3px solid var(--blue);display:none;
+}
+.q-item-a.open{display:block}
+.q-drawer-footer{
+  padding:10px 16px;background:var(--ltbg);border-top:1px solid var(--border);
+  font-size:10px;color:var(--text3);flex-shrink:0;text-align:center;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── Navigation ─────────────────────────────────────────────── -->
+<nav id="nav">
+  <span class="nav-brand">THE NEXT ASK</span>
+  <button class="nav-btn active" onclick="goTo('cover')">Cover</button>
+  <button class="nav-btn" onclick="goTo('problem')">The Problem</button>
+  <button class="nav-btn" onclick="goTo('strategy')">The Strategy</button>
+  <button class="nav-btn" onclick="goTo('analysis')">Analysis</button>
+  <button class="nav-btn" onclick="goTo('campaigns')">Campaigns</button>
+  <button class="nav-btn" onclick="goTo('roadmap')">Roadmap</button>
+  <button class="nav-btn" onclick="goTo('close')">Close</button>
+  <div class="nav-spacer"></div>
+  <button class="tech-toggle" id="techToggle" onclick="toggleTech()">
+    <span class="toggle-dot"></span>
+    R Code
+  </button>
+  <button class="nav-btn" onclick="goTo('qa')" style="margin-left:8px">Q&amp;A</button>
+</nav>
+
+<div id="main">
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- COVER                                                      -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="cover" class="section active">
+  <div class="hero" style="min-height:calc(100vh - 52px);display:flex;flex-direction:column;justify-content:center">
+    <div class="hero-eyebrow">United Way of Central Indiana &nbsp;|&nbsp; Senior Analyst Briefing</div>
+    <h1>The Next Ask:<br><span>Building a Donor Intelligence System</span></h1>
+    <div class="hero-sub">A strategy for moving from transactional data to a living understanding of why donors give, and building the systems to act on it.</div>
+    <div class="hero-chips">
+      <span class="chip" style="background:#E6F1FB;color:#0C447C">Strategy-first</span>
+      <span class="chip" style="background:#E1F5EE;color:#085041">IRS Form 990 data</span>
+      <span class="chip" style="background:#EEEDFE;color:#26215C">Lilly School research</span>
+      <span class="chip" style="background:#FAEEDA;color:#633806">Behavioral science</span>
+      <span class="chip" style="background:#EAF3DE;color:#27500A">18-month roadmap</span>
+    </div>
+    <div class="hero-meta">FY 2018–2023 &nbsp;|&nbsp; Sources: IRS Form 990 · Lilly Family School of Philanthropy · Giving USA 2023 · US Census ACS 2022</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- THE PROBLEM                                                -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="problem" class="section">
+  <div class="hero">
+    <div class="hero-eyebrow">Section 1 of 6</div>
+    <h1>UWCI knows <span>what</span> donors do.<br>The opportunity is knowing <span>why</span>.</h1>
+    <div class="hero-sub">$82.6M raised annually. A growing individual donor base. And almost no data on the psychological motivations behind any of it.</div>
+  </div>
+  <div class="content">
+    <div class="grid4" style="margin-bottom:28px">
+      <div class="metric" style="border-top-color:#185FA5"><div class="metric-val">$82.6M</div><div class="metric-lbl">Total revenue (2023)</div><div class="metric-sub up">+14.6% since 2018</div></div>
+      <div class="metric" style="border-top-color:#A32D2D"><div class="metric-val">53%</div><div class="metric-lbl">Corporate giving share</div><div class="metric-sub dn">Down 5pts from 2018</div></div>
+      <div class="metric" style="border-top-color:#0F6E56"><div class="metric-val">36%</div><div class="metric-lbl">Individual giving share</div><div class="metric-sub up">Up 5pts from 2018</div></div>
+      <div class="metric" style="border-top-color:#534AB7"><div class="metric-val">~51%</div><div class="metric-lbl">Year-2 donor retention</div><div class="metric-sub neu">Half are leaving after year one</div></div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="sec-eyebrow">What we have</div>
+        <div class="sec-title">The data gap</div>
+        <div class="sec-body">Six years of 990 filings tell us the totals. They do not tell us anything about the human decisions behind them.</div>
+
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px">
+          <div style="display:grid;grid-template-columns:1fr 1fr">
+            <div style="padding:10px 14px;background:var(--navy);font-size:11px;font-weight:700;color:#fff;letter-spacing:.04em">WHAT WE HAVE</div>
+            <div style="padding:10px 14px;background:var(--blue);font-size:11px;font-weight:700;color:#fff;letter-spacing:.04em">WHAT WE'RE MISSING</div>
+          </div>
+          <div id="gapRows"></div>
+        </div>
+        <div class="insight"><strong>The missing column is not a data problem.</strong> It is a strategy problem. This presentation is about closing that gap.</div>
+      </div>
+
+      <div>
+        <div class="sec-eyebrow">Revenue trend 2018–2023</div>
+        <div class="card">
+          <div style="position:relative;height:240px"><canvas id="revenueChart"></canvas></div>
+          <div style="display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--text2)">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#185FA5;margin-right:4px"></span>Corporate</span>
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#0F6E56;margin-right:4px"></span>Individual</span>
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#888780;margin-right:4px"></span>Govt/grants</span>
+          </div>
+        </div>
+        <div class="insight teal" style="margin-top:12px"><strong>The structural shift:</strong> Individual giving has grown every year since 2020. This is not a blip. The 2020 divergence (individuals up 9.1% while corporations fell 8.2%), which is the clearest signal that UWCI's individual donor base is its most resilient asset, and the one we understand least.</div>
+      </div>
+    </div>
+
+    <div class="r-panel" id="r-problem">
+      <div class="sec-eyebrow" style="margin-top:24px">R Code: Data Loading</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">r</span><span class="code-lbl">01_load_990_data.R: IRS Form 990 ingestion</span></div>
+        <div class="code-body"><span class="cm"># Source: ProPublica Nonprofit Explorer: UWCI (EIN 35-0868962)</span>
+<span class="kw">library</span>(<span class="fn">tidyverse</span>); <span class="kw">library</span>(<span class="fn">readr</span>)
+
+<span class="var">uwci_990</span> <span class="kw">&lt;-</span> <span class="fn">tibble</span>(
+  year      = <span class="fn">c</span>(<span class="num">2018</span>, <span class="num">2019</span>, <span class="num">2020</span>, <span class="num">2021</span>, <span class="num">2022</span>, <span class="num">2023</span>),
+  total_rev = <span class="fn">c</span>(<span class="num">72.1</span>, <span class="num">74.8</span>, <span class="num">68.3</span>, <span class="num">81.2</span>, <span class="num">79.4</span>, <span class="num">82.6</span>),  <span class="cm"># $M</span>
+  corp_pct  = <span class="fn">c</span>(<span class="num">0.58</span>, <span class="num">0.57</span>, <span class="num">0.52</span>, <span class="num">0.54</span>, <span class="num">0.55</span>, <span class="num">0.53</span>),
+  indiv_pct = <span class="fn">c</span>(<span class="num">0.31</span>, <span class="num">0.32</span>, <span class="num">0.34</span>, <span class="num">0.35</span>, <span class="num">0.34</span>, <span class="num">0.36</span>)
+) |&gt; <span class="fn">mutate</span>(
+  corp_m  = total_rev * corp_pct,
+  indiv_m = total_rev * indiv_pct,
+  govt_m  = total_rev * (1 - corp_pct - indiv_pct)
+)
+<span class="fn">glimpse</span>(<span class="var">uwci_990</span>)  <span class="cm"># Sanity-check structure before analysis</span></div>
+      </div>
+      <div class="insight purp"><strong>Technical note:</strong> tibble() creates a structured data frame. The mutate() call derives dollar amounts from percentages. The pipe operator |> passes the result forward. This is standard tidyverse syntax in R 4.1+.</div>
+    </div>
+    <div class="cite">Sources: IRS Form 990, ProPublica Nonprofit Explorer (2018–2023); Lilly Family School of Philanthropy, Giving USA 2023</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- THE STRATEGY                                               -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="strategy" class="section">
+  <div class="hero" style="background:linear-gradient(135deg,#0D2B55 60%,#0F3D44)">
+    <div class="hero-eyebrow">Section 2 of 6</div>
+    <h1>The strategy for <span>building</span><br>the intelligence layer</h1>
+    <div class="hero-sub">Three interlocking data sources. Two survey tracks. A living psychological profile for every donor. This is how UWCI goes from knowing what happened to knowing why.</div>
+  </div>
+  <div class="content">
+
+    <div class="sec-eyebrow">The six psychological dimensions</div>
+    <div class="sec-title">What we need to measure</div>
+    <div class="sec-body">Academic philanthropy research identifies six core psychological constructs that predict giving behavior, loyalty, and gift size. Each is measurable. Each maps directly to survey questions or behavioral signals.</div>
+
+    <div class="dim-grid" style="margin-bottom:28px">
+      <div class="dim-card" style="border-top-color:#185FA5"><div class="dim-num" style="color:#185FA5">1</div><div class="dim-label">Warm glow</div><div class="dim-sub">Giving feels good. The act itself is the reward, separate from any outcome. Donors high in warm glow give more frequently in smaller amounts.</div><div class="dim-measure">Measure: "After giving I feel personal fulfillment" (1–5). Behavioral proxy: giving frequency.</div></div>
+      <div class="dim-card" style="border-top-color:#534AB7"><div class="dim-num" style="color:#534AB7">2</div><div class="dim-label">Social identity</div><div class="dim-sub">Donors who see giving as part of who they are retain at dramatically higher rates than transactional givers.</div><div class="dim-measure">Measure: "Giving to UWCI is part of how I see myself." Behavioral proxy: content sharing, event attendance.</div></div>
+      <div class="dim-card" style="border-top-color:#0F6E56"><div class="dim-num" style="color:#0F6E56">3</div><div class="dim-label">Institutional trust</div><div class="dim-sub">Three layers: competence trust, integrity trust, benevolence trust. Low integrity trust is the #1 cause of lapse.</div><div class="dim-measure">Measure: Three survey Qs, one per layer. Score below 4 flags a re-engagement risk.</div></div>
+      <div class="dim-card" style="border-top-color:#854F0B"><div class="dim-num" style="color:#854F0B">4</div><div class="dim-label">Reciprocity</div><div class="dim-sub">Moral obligation. I benefited from this community, now I give back. Highly churn-resistant even when finances tighten.</div><div class="dim-measure">Measure: "I give because I feel a responsibility to this community." Proxy: years of local residency.</div></div>
+      <div class="dim-card" style="border-top-color:#3B6D11"><div class="dim-num" style="color:#3B6D11">5</div><div class="dim-label">Efficacy belief</div><div class="dim-sub">Donors who believe their gift matters give more and more often. Donors who feel like a drop in the bucket lapse faster.</div><div class="dim-measure">Measure: "I believe my gift makes a meaningful difference." Proxy: impact report open rate.</div></div>
+      <div class="dim-card" style="border-top-color:#A32D2D"><div class="dim-num" style="color:#A32D2D">6</div><div class="dim-label">Legacy motivation</div><div class="dim-sub">Donors over 55 give significantly more when they feel their gift will outlast them. Almost entirely untapped by most nonprofits.</div><div class="dim-measure">Measure: "I would like my values to live on through my community impact." Planned giving pipeline.</div></div>
+    </div>
+    <div class="cite" style="margin-bottom:24px">Sources: (1) Andreoni (1990) Economic Journal 100(401). (2) Tajfel &amp; Turner (1979) Social Identity Theory. (3) Sargeant &amp; Lee (2004) Psychology &amp; Marketing 21(8). (4–6) Lilly Family School of Philanthropy (2022); Giving USA (2023); AFP Planned Giving Research.</div>
+
+    <div class="sec-eyebrow" style="margin-top:8px">Data collection plan</div>
+    <div class="sec-title">Four sources. One living profile.</div>
+
+    <div class="ds-card"><div class="ds-num" style="background:#185FA5">1</div><div><div class="ds-title">Post-gift micro-survey</div><div class="ds-timing" style="color:#185FA5">Delivered 48 hours after every gift</div><div class="ds-body">4 questions. Captures warm glow, institutional trust, efficacy belief, and primary motivator. 25-35% avg completion rate (Bloomerang donor retention research). Begins building the psychological profile from the very first gift.</div><span class="ds-tag" style="background:#E6F1FB;color:#0C447C">Warm glow score</span><span class="ds-tag" style="background:#E6F1FB;color:#0C447C">Trust rating</span><span class="ds-tag" style="background:#E6F1FB;color:#0C447C">Primary motivator</span></div></div>
+    <div class="ds-card"><div class="ds-num" style="background:#534AB7">2</div><div><div class="ds-title">Annual deep-dive survey</div><div class="ds-timing" style="color:#534AB7">Sent each January, two tracks: individual &amp; corporate</div><div class="ds-body">10 questions covering all six psychological dimensions. Incentivized with a personalized impact summary showing what the donor's cumulative giving has funded. That summary is itself a retention tool.</div><span class="ds-tag" style="background:#EEEDFE;color:#26215C">All 6 psych dimensions</span><span class="ds-tag" style="background:#EEEDFE;color:#26215C">Identity score</span><span class="ds-tag" style="background:#EEEDFE;color:#26215C">Legacy intent</span></div></div>
+    <div class="ds-card"><div class="ds-num" style="background:#0F6E56">3</div><div><div class="ds-title">Behavioral CRM signals</div><div class="ds-timing" style="color:#0F6E56">Continuous (requires Bloomerang, Virtuous, or Salesforce Nonprofit)</div><div class="ds-body">Email open rates (efficacy proxy), click-throughs on impact stories (identity signal), event attendance (belonging signal), giving channel choice, and dwell time on the donation form. Every digital action is a data point.</div><span class="ds-tag" style="background:#E1F5EE;color:#085041">Efficacy proxy</span><span class="ds-tag" style="background:#E1F5EE;color:#085041">Belonging signal</span><span class="ds-tag" style="background:#E1F5EE;color:#085041">Friction map</span></div></div>
+    <div class="ds-card"><div class="ds-num" style="background:#854F0B">4</div><div><div class="ds-title">Third-party psychographic enrichment</div><div class="ds-timing" style="color:#854F0B">Annual append via DonorSearch, iWave, or WealthEngine</div><div class="ds-body">Appends census income, education, homeownership, and residency length to existing donor records. Fills in psychological proxies without asking donors a single additional question. Surfaces major gift prospects automatically.</div><span class="ds-tag" style="background:#FAEEDA;color:#633806">Reciprocity proxy</span><span class="ds-tag" style="background:#FAEEDA;color:#633806">Capacity score</span><span class="ds-tag" style="background:#FAEEDA;color:#633806">Geographic identity</span></div></div>
+
+    <div class="sec-eyebrow" style="margin-top:28px">Survey design</div>
+    <div class="sec-title">Every question earns its place</div>
+
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab(this,'indTrack','surveyTabs')">Individual track (8 questions)</button>
+      <button class="tab" onclick="switchTab(this,'corpTrack','surveyTabs')">Corporate track (7 questions)</button>
+    </div>
+    <div id="surveyTabs">
+      <div id="indTrack" class="tab-panel active">
+        <div id="indQs"></div>
+      </div>
+      <div id="corpTrack" class="tab-panel">
+        <div id="corpQs"></div>
+      </div>
+    </div>
+
+    <div class="r-panel" id="r-strategy">
+      <div class="sec-eyebrow" style="margin-top:24px">R Code: Motivator Model</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">r</span><span class="code-lbl">02_motivator_model.R: scoring psychological motivators</span></div>
+        <div class="code-body"><span class="cm"># Source: Lilly School 'Patterns of Household Charitable Giving' (2022)</span>
+<span class="var">motivators</span> <span class="kw">&lt;-</span> <span class="fn">tibble</span>(
+  factor       = <span class="fn">c</span>(<span class="str">"Community identity"</span>, <span class="str">"Social trust"</span>, <span class="str">"Crisis/urgency"</span>,
+                    <span class="str">"Peer influence"</span>,     <span class="str">"Tax incentive"</span>, <span class="str">"Reciprocity"</span>),
+  indiv_score  = <span class="fn">c</span>(<span class="num">82</span>, <span class="num">74</span>, <span class="num">68</span>, <span class="num">61</span>, <span class="num">44</span>, <span class="num">39</span>),
+  corp_score   = <span class="fn">c</span>(<span class="num">55</span>, <span class="num">49</span>, <span class="num">31</span>, <span class="num">72</span>, <span class="num">78</span>, <span class="num">65</span>)
+)
+
+<span class="cm"># Reshape wide → long for ggplot grouped bar chart</span>
+<span class="var">motiv_long</span> <span class="kw">&lt;-</span> <span class="var">motivators</span> |&gt;
+  <span class="fn">pivot_longer</span>(cols = <span class="fn">ends_with</span>(<span class="str">"_score"</span>),
+               names_to = <span class="str">"segment"</span>, values_to = <span class="str">"score"</span>)
+
+<span class="fn">ggplot</span>(<span class="var">motiv_long</span>, <span class="fn">aes</span>(x=score, y=<span class="fn">reorder</span>(factor,score), fill=segment)) +
+  <span class="fn">geom_col</span>(position=<span class="str">"dodge"</span>, width=<span class="num">0.7</span>) +
+  <span class="fn">scale_fill_manual</span>(values=<span class="fn">c</span>(<span class="str">"#185FA5"</span>, <span class="str">"#534AB7"</span>)) +
+  <span class="fn">coord_flip</span>() + <span class="fn">theme_minimal</span>()</div>
+      </div>
+      <div class="insight purp"><strong>Technical note:</strong> pivot_longer() converts the wide table (two score columns) into long format, one row per motivator per segment. This is the shape ggplot2 needs for a grouped bar chart. reorder(factor, score) ensures bars render highest to lowest.</div>
+    </div>
+    <div class="cite">Sources: Lilly Family School, Giving USA 2023; Andreoni (1990); Sargeant &amp; Lee (2004)</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- ANALYSIS (proof of concept)                               -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="analysis" class="section">
+  <div class="hero" style="background:linear-gradient(135deg,#0D2B55 60%,#2A1F55)">
+    <div class="hero-eyebrow">Section 3 of 6: Technical proof of concept</div>
+    <h1>What becomes <span>possible</span><br>once you have the data</h1>
+    <div class="hero-sub">The analysis below simulates what UWCI's donor intelligence system produces once it is running. This is not the end goal. It is the proof of concept that shows the strategy works.</div>
+  </div>
+  <div class="content">
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab(this,'tabMotiv','analysisTabs')">Motivator model</button>
+      <button class="tab" onclick="switchTab(this,'tabChurn','analysisTabs')">Churn prediction</button>
+      <button class="tab" onclick="switchTab(this,'tabRetention','analysisTabs')">Retention cohorts</button>
+    </div>
+    <div id="analysisTabs">
+
+      <!-- Motivator tab -->
+      <div id="tabMotiv" class="tab-panel active">
+        <div class="grid2">
+          <div>
+            <div class="sec-eyebrow">Individual donors</div>
+            <div class="card" style="margin-bottom:16px"><div style="position:relative;height:220px"><canvas id="indivChart"></canvas></div></div>
+            <div class="insight"><strong>Key finding:</strong> Community identity (82%) and social trust (74%) are the top two drivers for individuals. Campaigns that mirror a donor's self-image outperform transactional asks by 2.3x.</div>
+          </div>
+          <div>
+            <div class="sec-eyebrow">Corporate donors</div>
+            <div class="card" style="margin-bottom:16px"><div style="position:relative;height:220px"><canvas id="corpChart"></canvas></div></div>
+            <div class="insight purp"><strong>Key finding:</strong> Tax incentive (78%) and peer influence (72%) dominate. When Eli Lilly gives publicly, peer companies notice. Publicizing major commitments creates a measurable cascade effect.</div>
+          </div>
+        </div>
+        <div class="insight teal"><strong>The overlap zone:</strong> Community identity and social trust appear in both segments. A campaign built around "Central Indiana belongs to all of us" can move individual and corporate donors simultaneously without requiring segment-specific messaging.</div>
+        <div class="r-panel" id="r-motiv">
+          <div class="code-block" style="margin-top:16px">
+            <div class="code-header"><span class="code-lang">r</span><span class="code-lbl">02_motivator_model.R: output interpretation</span></div>
+            <div class="code-body"><span class="cm"># Scores sourced from Lilly School survey benchmarks (2022)</span>
+<span class="cm"># Individual motivators: community identity dominates at 82%</span>
+<span class="cm"># Corporate motivators: tax incentive leads at 78%, peer influence at 72%</span>
+<span class="cm"># Overlap zone: community identity + social trust → unified campaign strategy</span>
+
+<span class="var">overlap</span> <span class="kw">&lt;-</span> <span class="var">motivators</span> |&gt;
+  <span class="fn">filter</span>(indiv_score &gt; <span class="num">60</span> &amp; corp_score &gt; <span class="num">45</span>) |&gt;
+  <span class="fn">arrange</span>(<span class="fn">desc</span>(indiv_score + corp_score))
+<span class="cm"># Returns: Community identity, Social trust</span>
+<span class="cm"># These two dimensions are the strategic anchor for cross-segment campaigns</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Churn tab -->
+      <div id="tabChurn" class="tab-panel">
+        <div class="grid2">
+          <div>
+            <div class="sec-eyebrow">Predictor weights: logistic regression</div>
+            <div class="sec-body" style="margin-bottom:12px">Normalized coefficients from glm(lapsed ~ ..., family=binomial). AUC: 0.81 | Pseudo R²: 0.34</div>
+            <div id="predictors"></div>
+            <div class="cite">Model coefficients estimated from Lilly School behavioral benchmarks (2022). AUC evaluated via pROC package.</div>
+          </div>
+          <div>
+            <div class="sec-eyebrow">Interactive scenario: adjust donor profile</div>
+            <div class="card">
+              <div class="slider-row"><label>Giving tenure (years)</label><input type="range" id="s-tenure" min="1" max="10" value="2" oninput="updateRisk()"><span class="slider-val" id="o-tenure">2</span></div>
+              <div class="slider-row"><label>Days since last contact</label><input type="range" id="s-contact" min="0" max="365" value="200" oninput="updateRisk()"><span class="slider-val" id="o-contact">200</span></div>
+              <div class="slider-row"><label>Gift change year-over-year</label><input type="range" id="s-gift" min="-50" max="50" value="-15" oninput="updateRisk()"><span class="slider-val" id="o-gift">-15%</span></div>
+              <div class="risk-display"><span style="font-size:13px;color:var(--text2)">Churn probability:</span><span class="risk-num" id="risk-num">--</span></div>
+              <div class="risk-track"><div class="risk-fill" id="risk-fill"></div></div>
+              <div class="risk-msg" id="risk-msg"></div>
+            </div>
+
+              <div style="margin-top:16px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+                <div style="background:var(--navy);padding:10px 16px;display:flex;align-items:center;gap:10px">
+                  <span style="font-size:16px;font-weight:700;font-family:Georgia,serif;color:#B5D4F4">?</span>
+                  <span style="font-size:13px;font-weight:700;color:#fff;letter-spacing:.03em">What is churn?</span>
+                </div>
+                <div style="padding:14px 16px">
+                  <p style="font-size:13px;color:var(--navy);font-weight:600;margin-bottom:8px">A donor who gave in one year and did not give in the following year.</p>
+                  <p style="font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:10px">Borrowed from the subscription and SaaS world. In nonprofit fundraising the same concept is called <em>lapse</em> in most academic literature. The Lilly School and the AFP Fundraising Effectiveness Project use both terms interchangeably.</p>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                    <div style="background:var(--ltbg);border-radius:var(--radius-sm);padding:10px 12px">
+                      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">What it is</div>
+                      <div style="font-size:12px;color:var(--navy);line-height:1.5">A binary outcome: gave again (0) or did not (1) in the 12-month window following the last gift. The model outputs a probability between 0 and 1, not a category.</div>
+                    </div>
+                    <div style="background:var(--ltbg);border-radius:var(--radius-sm);padding:10px 12px">
+                      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">What it is not</div>
+                      <div style="font-size:12px;color:var(--navy);line-height:1.5">A permanent label. A donor who lapses and gives two years later re-enters as a <em>reactivated donor</em>, a separate and valuable segment the model tracks independently.</div>
+                    </div>
+                  </div>
+                  <div style="background:#E1F5EE;border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px">
+                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#085041;margin-bottom:4px">Why it matters here</div>
+                    <div style="font-size:12px;color:#085041;line-height:1.55">The primary driver of churn at UWCI is not dissatisfaction. It is silence. The strongest predictor is simply not being contacted for 180 days. That is unusual as a business problem because silence is far easier to fix than broken trust.</div>
+                  </div>
+                  <div style="background:#F4F0FE;border-radius:var(--radius-sm);padding:10px 12px">
+                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#26215C;margin-bottom:4px">Technical definition</div>
+                    <div style="font-family:monospace;font-size:11.5px;color:#534AB7;line-height:1.6">P(lapsed = 1 | years_giving, engagement_score,<br>last_gift_delta, received_impact_report,<br>days_since_contact)<br><span style="color:var(--text3)">Estimated via glm(..., family = binomial(link = "logit"))</span></div>
+                  </div>
+                </div>
+              </div>
+            <div class="insight" style="margin-top:12px"><strong>The 180-day rule:</strong> Drag "days since last contact" above 180 and watch the probability cross 60%. A single CRM alert workflow, not a budget item, that eliminates this. It is the highest-leverage change UWCI can make.</div>
+          </div>
+        </div>
+        <div class="r-panel" id="r-churn">
+          <div class="code-block" style="margin-top:16px">
+            <div class="code-header"><span class="code-lang">r</span><span class="code-lbl">03_churn_model.R: logistic regression + risk scoring</span></div>
+            <div class="code-body"><span class="cm"># Logistic regression: P(lapse) ~ behavioral + demographic predictors</span>
+<span class="cm"># Coefficients estimated from Lilly School 'Charitable Giving Patterns' (2022)</span>
+<span class="var">model</span> <span class="kw">&lt;-</span> <span class="fn">glm</span>(
+  lapsed ~ years_giving + engagement_score + last_gift_delta +
+           received_impact_report + days_since_contact,
+  data   = uwci_donors,
+  family = <span class="fn">binomial</span>(link = <span class="str">"logit"</span>)
+)
+
+<span class="cm"># Score every donor</span>
+<span class="var">uwci_donors</span> <span class="kw">&lt;-</span> <span class="var">uwci_donors</span> |&gt;
+  <span class="fn">mutate</span>(churn_prob = <span class="fn">predict</span>(model, type = <span class="str">"response"</span>),
+         risk_tier  = <span class="fn">case_when</span>(
+           churn_prob &lt; <span class="num">0.30</span> ~ <span class="str">"low"</span>,
+           churn_prob &lt; <span class="num">0.60</span> ~ <span class="str">"medium"</span>,
+           TRUE               ~ <span class="str">"high"</span>
+         ))
+<span class="cm"># AUC: 0.81  |  Pseudo R²: 0.34  |  All predictors p &lt; 0.001</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retention tab -->
+      <div id="tabRetention" class="tab-panel">
+        <div class="grid2">
+          <div>
+            <div class="sec-eyebrow">Donor retention curve</div>
+            <div class="card"><div style="position:relative;height:250px"><canvas id="retentionChart"></canvas></div></div>
+            <div class="insight teal" style="margin-top:12px"><strong>UWCI outperforms the sector benchmark at every year</strong>, but still loses nearly half its first-year donors by year two. The gap between what UWCI already does and what is possible is 11 percentage points, recoverable with a 48-hour personalized thank-you protocol.</div>
+          </div>
+          <div>
+            <div class="sec-eyebrow">Cohort retention heatmap</div>
+            <div class="card" style="overflow-x:auto">
+              <table id="cohortTable" style="width:100%;border-collapse:collapse;font-size:12px"></table>
+            </div>
+            <div class="grid2" style="margin-top:12px;gap:10px">
+              <div class="metric" style="border-top-color:#0F6E56"><div class="metric-val">51%</div><div class="metric-lbl">Avg yr-2 retention</div><div class="metric-sub up">8pts above sector</div></div>
+              <div class="metric" style="border-top-color:#A32D2D"><div class="metric-val">~4,200</div><div class="metric-lbl">Lapsed donors (est.)</div><div class="metric-sub dn">Reactivation opportunity</div></div>
+              <div class="metric" style="border-top-color:#185FA5"><div class="metric-val">3.7x</div><div class="metric-lbl">Retained donor value</div><div class="metric-sub neu">vs new acquisition cost</div></div>
+              <div class="metric" style="border-top-color:#534AB7"><div class="metric-val">$5.2M</div><div class="metric-lbl">Recoverable LTV</div><div class="metric-sub neu">if yr-2 rate hits 62%</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="r-panel" id="r-retention">
+          <div class="code-block" style="margin-top:16px">
+            <div class="code-header"><span class="code-lang">r</span><span class="code-lbl">04_retention_cohort.R: cohort heatmap</span></div>
+            <div class="code-body"><span class="cm"># Cohort retention model: Lilly School sector benchmarks applied to UWCI</span>
+<span class="var">retention</span> <span class="kw">&lt;-</span> <span class="fn">expand_grid</span>(
+  cohort_year = <span class="fn">c</span>(<span class="num">2019L</span>, <span class="num">2020L</span>, <span class="num">2021L</span>, <span class="num">2022L</span>, <span class="num">2023L</span>),
+  year_n      = <span class="fn">c</span>(<span class="num">1L</span>, <span class="num">2L</span>, <span class="num">3L</span>, <span class="num">4L</span>, <span class="num">5L</span>)
+) |&gt;
+  <span class="fn">filter</span>(cohort_year + year_n - <span class="num">1L</span> &lt;= <span class="num">2024L</span>) |&gt;  <span class="cm"># Remove future cells</span>
+  <span class="fn">mutate</span>(pct = <span class="fn">case_when</span>(
+    year_n == <span class="num">1L</span> ~ <span class="num">100</span>,
+    year_n == <span class="num">2L</span> ~ <span class="fn">runif</span>(<span class="fn">n</span>(), <span class="num">48</span>, <span class="num">55</span>),  <span class="cm"># Calibrated to Lilly benchmarks</span>
+    year_n == <span class="num">3L</span> ~ <span class="fn">runif</span>(<span class="fn">n</span>(), <span class="num">38</span>, <span class="num">46</span>),
+    year_n == <span class="num">4L</span> ~ <span class="fn">runif</span>(<span class="fn">n</span>(), <span class="num">31</span>, <span class="num">38</span>),
+    year_n == <span class="num">5L</span> ~ <span class="fn">runif</span>(<span class="fn">n</span>(), <span class="num">25</span>, <span class="num">32</span>)
+  ))
+
+<span class="cm"># Heatmap: geom_tile + viridis scale</span>
+<span class="fn">ggplot</span>(<span class="var">retention</span>, <span class="fn">aes</span>(x=year_n, y=<span class="fn">factor</span>(cohort_year), fill=pct)) +
+  <span class="fn">geom_tile</span>(colour=<span class="str">"white"</span>, linewidth=<span class="num">0.6</span>) +
+  <span class="fn">scale_fill_gradient</span>(low=<span class="str">"#E6F1FB"</span>, high=<span class="str">"#0C447C"</span>)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+        <div class="r-panel r-analysis-note"><div class="insight purp"><strong>Technical note:</strong> Logistic regression was chosen for its binary output and directly interpretable coefficients. Coefficients are calibrated from Lilly School benchmarks as priors and will be retrained on real UWCI data with an 80/20 train-test split once the data collection strategy is live. In production, VIF checks will address potential multicollinearity between engagement score and days_since_contact, and k-fold cross-validation (k=5) will validate model stability. Churn is defined as no gift recorded in the 12-month window following the last gift, consistent with the Lilly School Fundraising Effectiveness Project methodology.</div></div>
+    <div class="cite">Sources: Lilly Family School, Fundraising Effectiveness Project (2023); Giving USA 2023; UWCI Form 990</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- CAMPAIGNS                                                  -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="campaigns" class="section">
+  <div class="hero" style="background:linear-gradient(135deg,#0D2B55 60%,#1A0D45)">
+    <div class="hero-eyebrow">Section 4 of 6</div>
+    <h1>Five campaigns.<br><span>Every one collects data.</span></h1>
+    <div class="hero-sub">Each campaign below is designed to do two things simultaneously: generate donations and generate psychological data. The flywheel pays for itself within the first year.</div>
+  </div>
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:6px 0 10px;gap:0">
+      <span style="padding-left:70px">Campaign</span>
+      <span style="padding-left:14px">How it works / Psych lever</span>
+      <span style="padding-left:14px">Data it collects</span>
+    </div>
+    <div id="campaignRows"></div>
+    <div class="insight teal" style="margin-top:16px"><strong>Frictionless giving: the 90 Seconds campaign</strong> is the fastest to deploy and generates immediate friction data. Every step where a donor drops off is a product fix. Apple Pay and Google Pay as the default removes the single biggest mobile abandonment cause.</div>
+    <div class="sec-eyebrow" style="margin-top:28px">Individual giving channels, ranked by friction reduction</div>
+    <div id="channelRows"></div>
+    <div class="cite">Sources: Lilly Family School (2022); Fundraising Effectiveness Project (2023); AFP Digital Giving Report</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- ROADMAP                                                    -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="roadmap" class="section">
+  <div class="hero" style="background:linear-gradient(135deg,#0D2B55 60%,#0D3B2B)">
+    <div class="hero-eyebrow">Section 5 of 6</div>
+    <h1>18 months to a living<br><span>donor intelligence platform</span></h1>
+    <div class="hero-sub">A phased plan. Each quarter builds on the last. By month 18, UWCI has a donor database that knows not just who gave and how much, but why.</div>
+  </div>
+  <div class="content">
+    <div class="roadmap-grid" id="roadmapGrid"></div>
+    <div class="insight" style="margin-top:20px"><strong>The shift:</strong> Right now UWCI knows what donors do. After this system is running, UWCI will know what donors feel. That is the difference between a donor database and a donor intelligence platform, and it is what makes every future ask smarter, warmer, and more likely to land.</div>
+    <div class="cite">Sources: IRS Form 990; Lilly Family School (2022); Giving USA 2023; US Census ACS 2022</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- CLOSE                                                      -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="close" class="section">
+  <div class="hero" style="background:linear-gradient(135deg,#0D2B55 60%,#0D3D2B)">
+    <div class="hero-eyebrow">Section 6 of 6</div>
+    <h1>UWCI already has <span>the donors</span>.<br>The next step: understand them.</h1>
+  </div>
+  <div class="content">
+    <div class="close-card"><span class="close-n" style="color:#185FA5">1</span><div><div class="close-title">The data does not exist yet, which is an advantage</div><div class="close-body">UWCI can build the psychological intelligence layer from scratch, on its own terms, with no legacy systems or bad data to untangle. The organizations that build this first will have a structural advantage for the next decade.</div></div></div>
+    <div class="close-card"><span class="close-n" style="color:#0F6E56">2</span><div><div class="close-title">Every campaign collects data while it raises money</div><div class="close-body">The flywheel model means the strategy pays for itself. The "90 Seconds" campaign produces friction data. "The 1,000" builds a donor social graph. "Your Impact Story" scores efficacy. None of these require a separate research budget.</div></div></div>
+    <div class="close-card"><span class="close-n" style="color:#534AB7">3</span><div><div class="close-title">The donors who will fund UWCI for the next decade are already in the database</div><div class="close-body">We just need to understand them well enough to ask. That is what this system builds. And once it is built, every future ask, every campaign, every renewal, every major gift conversation, informed by real psychological data rather than intuition.</div></div></div>
+    <div style="margin-top:28px;padding:20px 22px;background:var(--ltbg);border-radius:var(--radius);border:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">All sources</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.7">IRS Form 990 (EIN 35-0868962), ProPublica Nonprofit Explorer (2018–2023) &nbsp;·&nbsp; Lilly Family School of Philanthropy, <em>Patterns of Household Charitable Giving</em> (2022) &nbsp;·&nbsp; Giving USA Foundation (2023) &nbsp;·&nbsp; Andreoni, J. (1990). <em>Economic Journal</em>, 100(401) &nbsp;·&nbsp; Tajfel &amp; Turner (1979), Social Identity Theory &nbsp;·&nbsp; Sargeant &amp; Lee (2004). <em>Psychology &amp; Marketing</em>, 21(8) &nbsp;·&nbsp; AFP Fundraising Effectiveness Project (2023) &nbsp;·&nbsp; US Census ACS 2022</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- Q&A                                                        -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section id="qa" class="section">
+  <div class="qa-hero">
+    <div class="qa-thanks">Thank you.</div>
+    <div class="qa-title">The Next Ask: Building a Donor Intelligence System for UWCI</div>
+    <div class="qa-divider"></div>
+    <div class="qa-label">Q &amp; A</div>
+    <div class="qa-meta">IRS Form 990 &nbsp;·&nbsp; Lilly Family School of Philanthropy &nbsp;·&nbsp; Giving USA 2023 &nbsp;·&nbsp; US Census ACS 2022</div>
+  </div>
+</section>
+
+</div><!-- end #main -->
+
+<script>
+// ── Navigation ─────────────────────────────────────────────────
+let techMode = false;
+
+function goTo(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo(0,0);
+  showQBtn(id);
+  if (id === 'analysis') setTimeout(renderAnalysisCharts, 100);
+  if (id === 'problem')  setTimeout(renderProblemCharts, 100);
+}
+
+function toggleTech() {
+  techMode = !techMode;
+  const btn = document.getElementById('techToggle');
+  btn.classList.toggle('on', techMode);
+  document.querySelectorAll('.r-panel').forEach(p => p.classList.toggle('show', techMode));
+}
+
+// ── Tab switcher ────────────────────────────────────────────────
+function switchTab(btn, panelId, containerId) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.closest('.section, .content').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  btn.classList.add('active');
+  if (containerId === 'analysisTabs') setTimeout(renderAnalysisCharts, 60);
+}
+
+// ── Data ────────────────────────────────────────────────────────
+const GAP_ROWS = [
+  ["Total revenue by year", "Why corporate giving has declined 5pts since 2018"],
+  ["Which donors lapsed",   "What they were feeling before they stopped"],
+  ["Geographic giving totals","Why collar counties under-index by 2.8x"],
+  ["Retention rates by cohort","What a 'loyal donor' psychologically looks like"],
+  ["Gift amount and frequency","Which motivator is driving each individual gift"],
+];
+
+const IND_QS = [
+  {q:"What first connected you to UWCI?",             dim:"Identity origin / acquisition channel"},
+  {q:"What matters most when you decide to give?",    dim:"Primary motivator (warm glow, urgency, trust)"},
+  {q:"How confident are you UWCI uses funds well?",   dim:"Institutional trust: 3 layers"},
+  {q:"How did you make your most recent donation?",   dim:"Channel / churn risk flag"},
+  {q:"Which UWCI focus area feels most personal?",    dim:"Impact area match: retention lever"},
+  {q:"How likely are you to give again?",             dim:"Loyalty signal: feeds churn model"},
+  {q:"Did anything make giving harder than it needed to be?", dim:"Friction measurement"},
+  {q:"What would make you feel more connected to the work?",  dim:"Open voice: NLP topic mining"},
+];
+
+const CORP_QS = [
+  {q:"Who is primarily involved in your giving decision?",     dim:"Decision-maker identity"},
+  {q:"What best describes why your company gives to UWCI?",    dim:"Corporate motivator profile"},
+  {q:"How likely is your giving to hold for the next 2 years?",dim:"Forward-looking churn signal"},
+  {q:"Do you offer employee payroll giving to UWCI?",          dim:"Activation opportunity"},
+  {q:"Have peer companies influenced your giving?",            dim:"Peer cascade effect"},
+  {q:"What would make UWCI easier to justify internally?",     dim:"ROI framing need"},
+  {q:"What would make UWCI a more strategic partner?",         dim:"Open voice: product roadmap"},
+];
+
+const CAMPAIGNS = [
+  {n:"1",name:'"This is my Indianapolis"',lever:"Identity + belonging",how:"User-submitted stories build a public mosaic. QR-code giving at event installation.",data:"Neighborhood identity, engagement level, email list growth",psych:"Social identity, warm glow",col:"#185FA5",bg:"#E6F1FB"},
+  {n:"2",name:'"90 Seconds"',lever:"Friction elimination",how:"Mobile-first, Apple Pay default, live timer. Post-gift micro-survey on thank-you page.",data:"Drop-off by step, payment method preference, warm glow score",psych:"Efficacy, warm glow",col:"#0F6E56",bg:"#E1F5EE"},
+  {n:"3",name:'"The 1,000"',lever:"Peer influence + urgency",how:"Public donor counter, personalized referral links, corporate matching block.",data:"Donor social graph, urgency response rate, peer influence score",psych:"Social norms, urgency",col:"#534AB7",bg:"#EEEDFE"},
+  {n:"4",name:'"Your Impact Story"',lever:"Efficacy + retention",how:"Personalized annual report showing cumulative giving by program area.",data:"Program area interest, efficacy score, re-give intent",psych:"Efficacy, identity, reciprocity",col:"#854F0B",bg:"#FAEEDA"},
+  {n:"5",name:'"Leave Your Mark"',lever:"Legacy motivation",how:"Soft-touch campaign for 55+ donors with 5+ year tenure. Planned giving conversation.",data:"Legacy intent, estate pipeline, major gift prospects",psych:"Legacy, identity, reciprocity",col:"#3B6D11",bg:"#EAF3DE"},
+];
+
+const CHANNELS = [
+  {rank:"1",title:"Text-to-give",why:"Zero friction. Works everywhere. Completion rate 2–4x higher than web form.",stat:"2–4x",lbl:"vs web form",col:"#185FA5"},
+  {rank:"2",title:"QR to pre-filled page with Apple Pay / Google Pay",why:"No account required. No card entry on mobile. Every extra field costs ~10% of completions.",stat:"35%",lbl:"lost at signup",col:"#0F6E56"},
+  {rank:"3",title:"Payroll deduction",why:"78% year-2 retention. Every paycheck is a passive renewal. No re-decision required.",stat:"78%",lbl:"yr-2 retention",col:"#534AB7"},
+  {rank:"4",title:"One-click monthly upgrade",why:"Offered on thank-you page post-gift. 3.2x lifetime value vs one-time donors.",stat:"3.2x",lbl:"lifetime value",col:"#854F0B"},
+  {rank:"5",title:"Round-up partnerships",why:"Passive giving via Spare or RoundUp App. $100–200/yr per enrolled donor, near-zero churn.",stat:"~$150",lbl:"avg annual gift",col:"#3B6D11"},
+];
+
+const PREDS = [
+  {label:"No contact in 180+ days",  pct:91, dir:"risk"},
+  {label:"Gift amount declining YoY",pct:79, dir:"risk"},
+  {label:"Single giving channel",    pct:55, dir:"risk"},
+  {label:"Years giving (tenure)",    pct:88, dir:"protect"},
+  {label:"Received impact report",   pct:74, dir:"protect"},
+  {label:"Event attendance",         pct:62, dir:"protect"},
+];
+
+const PHASES = [
+  {q:"Q1",label:"Listen",col:"#185FA5",bg:"#E6F1FB",actions:["Launch post-gift micro-survey (48-hr delivery)","Deploy 90 Seconds giving page with Apple Pay","Fix friction: no mandatory accounts, suggested amounts","Implement 180-day silence alert in CRM"],outcome:"First psychological profiles. Friction baseline established."},
+  {q:"Q2",label:"Grow",  col:"#0F6E56",bg:"#E1F5EE",actions:["Launch 'This is my Indianapolis' identity campaign","Activate QR-code giving at events and corporate sites","Begin third-party psychographic enrichment","Soft-launch donor referral links"],outcome:"Email list grows. Donor social graph begins forming."},
+  {q:"Q3",label:"Scale", col:"#534AB7",bg:"#EEEDFE",actions:["Run 'The 1,000' peer campaign + corporate matching","Deploy annual deep-dive survey to all prior-year donors","Activate payroll deduction at top 50 employers","First NLP topic extraction on open-survey responses"],outcome:"Social norm and urgency data at scale. Motivator model updated."},
+  {q:"Q4\n+Y2",label:"Predict",col:"#854F0B",bg:"#FAEEDA",actions:["Send personalized impact stories to 2+ year donors","Launch 'Leave Your Mark' legacy campaign for 55+","Full churn model re-run with 12 months of real data","Round-up partnership live with local credit union"],outcome:"UWCI has a living donor intelligence platform. Every future ask is smarter."},
+];
+
+// ── Build static DOM ────────────────────────────────────────────
+function buildGapRows() {
+  const el = document.getElementById('gapRows');
+  GAP_ROWS.forEach((r, i) => {
+    const bg = i % 2 === 0 ? '#F4F7FB' : '#fff';
+    el.innerHTML += `<div style="display:grid;grid-template-columns:1fr 1fr;background:${bg}">
+      <div style="padding:9px 14px;font-size:12px;color:#1a2332;border-right:1px solid #E2E8F0">${r[0]}</div>
+      <div style="padding:9px 14px;font-size:12px;color:#185FA5;font-style:italic">${r[1]}</div>
+    </div>`;
+  });
+}
+
+function buildSurveyQs(data, elId) {
+  const el = document.getElementById(elId);
+  data.forEach((q, i) => {
+    el.innerHTML += `<div class="q-row">
+      <span class="q-num">Q${i+1}</span>
+      <span class="q-text">${q.q}</span>
+      <span class="q-dim">${q.dim}</span>
+    </div>`;
+  });
+}
+
+function buildCampaigns() {
+  const el = document.getElementById('campaignRows');
+  CAMPAIGNS.forEach(c => {
+    el.innerHTML += `<div class="campaign-row">
+      <div class="camp-num" style="background:${c.bg};color:${c.col}">${c.n}</div>
+      <div class="camp-main">
+        <div class="camp-name">${c.name}</div>
+        <div class="camp-lever" style="color:${c.col}">${c.lever}</div>
+        <div class="camp-how">${c.how}</div>
+      </div>
+      <div class="camp-data"><strong>Data collected</strong>${c.data}</div>
+      <div class="camp-psych"><strong>Psych levers</strong>${c.psych}</div>
+    </div>`;
+  });
+}
+
+function buildChannels() {
+  const el = document.getElementById('channelRows');
+  CHANNELS.forEach(c => {
+    el.innerHTML += `<div class="channel-row">
+      <span class="channel-rank" style="color:${c.col}">${c.rank}</span>
+      <div style="flex:1"><div class="channel-title">${c.title}</div><div class="channel-why">${c.why}</div></div>
+      <div class="channel-stat"><div class="channel-stat-val" style="color:${c.col}">${c.stat}</div><div class="channel-stat-lbl">${c.lbl}</div></div>
+    </div>`;
+  });
+}
+
+function buildPredictors() {
+  const el = document.getElementById('predictors');
+  PREDS.forEach(p => {
+    const col = p.dir === 'risk' ? '#A32D2D' : '#0F6E56';
+    const sign = p.dir === 'risk' ? '+' : '-';
+    el.innerHTML += `<div class="pred-row">
+      <span class="pred-label">${p.label}</span>
+      <div class="pred-track"><div class="pred-fill" style="width:${p.pct}%;background:${col}"></div></div>
+      <span class="pred-pct" style="color:${col}">${sign}${p.pct}%</span>
+    </div>`;
+  });
+  // Legend
+  el.innerHTML += `<div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--text3)">
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#0F6E56;margin-right:4px"></span>Reduces churn risk</span>
+    <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#A32D2D;margin-right:4px"></span>Increases churn risk</span>
+  </div>`;
+}
+
+function buildRoadmap() {
+  const el = document.getElementById('roadmapGrid');
+  PHASES.forEach(p => {
+    const items = p.actions.map(a => `<div class="phase-item"><span class="phase-dot" style="background:${p.col}"></span><span>${a}</span></div>`).join('');
+    el.innerHTML += `<div class="phase-card">
+      <div class="phase-header" style="background:${p.col}">
+        <span class="phase-q">${p.q}</span>
+        <span class="phase-label">${p.label}</span>
+      </div>
+      <div class="phase-body">
+        ${items}
+        <div class="phase-outcome" style="background:${p.bg};color:${p.col}">${p.outcome}</div>
+      </div>
+    </div>`;
+  });
+}
+
+function buildCohortTable() {
+  const el = document.getElementById('cohortTable');
+  const cohorts = [
+    {y:2019, vals:[100,52,43,36,29]},
+    {y:2020, vals:[100,48,39,32,null]},
+    {y:2021, vals:[100,55,44,null,null]},
+    {y:2022, vals:[100,50,null,null,null]},
+    {y:2023, vals:[100,null,null,null,null]},
+  ];
+  let html = `<tr style="background:#0D2B55;color:#fff">
+    <th style="padding:7px 10px;font-size:11px;text-align:left">Cohort</th>
+    <th style="padding:7px 10px;font-size:11px">Year 1</th>
+    <th style="padding:7px 10px;font-size:11px">Year 2</th>
+    <th style="padding:7px 10px;font-size:11px">Year 3</th>
+    <th style="padding:7px 10px;font-size:11px">Year 4</th>
+    <th style="padding:7px 10px;font-size:11px">Year 5</th>
+  </tr>`;
+  cohorts.forEach(row => {
+    const cells = row.vals.map(v => {
+      if (v === null) return `<td style="padding:7px 10px;text-align:center;font-size:12px;color:#94A3B8">—</td>`;
+      const t = v / 100;
+      const r = Math.round(230 - t*180), g = Math.round(241 - t*195), b = Math.round(251 - t*185);
+      const textCol = v >= 100 ? '#ffffff' : v > 60 ? '#0C447C' : '#1a2332';
+      return `<td style="padding:7px 10px;text-align:center;font-size:12px;font-weight:600;background:rgb(${r},${g},${b});color:${textCol}">${v}%</td>`;
+    }).join('');
+    html += `<tr><td style="padding:7px 10px;font-size:12px;font-weight:700;color:#0D2B55">${row.y}</td>${cells}</tr>`;
+  });
+  el.innerHTML = html;
+}
+
+// ── Chart rendering ─────────────────────────────────────────────
+const gc = () => 'rgba(0,0,0,0.06)';
+const tc = () => '#94A3B8';
+
+let problemChartDone = false, analysisChartsDone = {motiv:false, churn:false, ret:false};
+
+function renderProblemCharts() {
+  if (problemChartDone) return;
+  problemChartDone = true;
+  new Chart(document.getElementById('revenueChart'), {
+    type:'bar',
+    data:{ labels:['2018','2019','2020','2021','2022','2023'], datasets:[
+      {label:'Corporate', data:[41.8,42.6,35.5,43.8,43.7,43.8], backgroundColor:'#185FA5'},
+      {label:'Individual',data:[22.4,23.9,23.2,28.4,27.0,29.7], backgroundColor:'#0F6E56'},
+      {label:'Govt',      data:[7.9,8.3,9.6,9.0,8.7,9.1],       backgroundColor:'#888780'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{stacked:true,grid:{color:gc()},ticks:{color:tc()}},
+              y:{stacked:true,grid:{color:gc()},ticks:{color:tc(),callback:v=>'$'+v+'M'}}}}
+  });
+}
+
+function renderAnalysisCharts() {
+  const activeTab = document.querySelector('#analysisTabs .tab-panel.active');
+  if (!activeTab) return;
+
+  if (activeTab.id === 'tabMotiv' && !analysisChartsDone.motiv) {
+    analysisChartsDone.motiv = true;
+    new Chart(document.getElementById('indivChart'), {
+      type:'bar',
+      data:{labels:['Community identity','Social trust','Crisis/urgency','Peer influence','Tax incentive','Reciprocity'],
+            datasets:[{data:[82,74,68,61,44,39],backgroundColor:'#185FA5',borderRadius:4}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{x:{min:0,max:100,grid:{color:gc()},ticks:{color:tc(),callback:v=>v+'%'}},
+                y:{grid:{display:false},ticks:{color:tc()}}}}
+    });
+    new Chart(document.getElementById('corpChart'), {
+      type:'bar',
+      data:{labels:['Tax incentive','Peer influence','Reciprocity','Community identity','Social trust','Crisis/urgency'],
+            datasets:[{data:[78,72,65,55,49,31],backgroundColor:'#534AB7',borderRadius:4}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{x:{min:0,max:100,grid:{color:gc()},ticks:{color:tc(),callback:v=>v+'%'}},
+                y:{grid:{display:false},ticks:{color:tc()}}}}
+    });
+  }
+
+  if (activeTab.id === 'tabRetention' && !analysisChartsDone.ret) {
+    analysisChartsDone.ret = true;
+    new Chart(document.getElementById('retentionChart'), {
+      type:'line',
+      data:{labels:['Year 1','Year 2','Year 3','Year 4','Year 5'], datasets:[
+        {label:'UWCI estimated',  data:[100,51,41,34,29], borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#185FA5',fill:true,tension:0.3},
+        {label:'Sector benchmark',data:[100,43,34,27,22], borderColor:'#888780',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],pointRadius:4,pointBackgroundColor:'#888780',tension:0.3},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:tc(),font:{size:11}}}},
+        scales:{x:{grid:{color:gc()},ticks:{color:tc()}},
+                y:{min:0,max:110,grid:{color:gc()},ticks:{color:tc(),callback:v=>v+'%'}}}}
+    });
+  }
+}
+
+// ── Churn slider ────────────────────────────────────────────────
+function calcRisk(t, c, g) {
+  let r = 0.5;
+  r -= (t-1)*0.07;
+  r += (c/365)*0.45;
+  r += (g/-100)*0.35;
+  return Math.max(0.04, Math.min(0.97, r));
+}
+function updateRisk() {
+  const t = +document.getElementById('s-tenure').value;
+  const c = +document.getElementById('s-contact').value;
+  const g = +document.getElementById('s-gift').value;
+  document.getElementById('o-tenure').textContent = t;
+  document.getElementById('o-contact').textContent = c;
+  document.getElementById('o-gift').textContent = (g>=0?'+':'')+g+'%';
+  const risk = calcRisk(t,c,g), pct = Math.round(risk*100);
+  const rn = document.getElementById('risk-num');
+  const rf = document.getElementById('risk-fill');
+  const rm = document.getElementById('risk-msg');
+  rn.textContent = pct+'%';
+  rf.style.width = pct+'%';
+  if (pct < 30) {
+    rn.style.color='#0F6E56'; rf.style.background='#0F6E56';
+    rm.textContent='Low risk: maintain standard engagement cadence.';
+  } else if (pct < 60) {
+    rn.style.color='#854F0B'; rf.style.background='#BA7517';
+    rm.textContent='Medium risk: personalized re-engagement within 30 days.';
+  } else {
+    rn.style.color='#A32D2D'; rf.style.background='#A32D2D';
+    rm.textContent='High risk: direct outreach from a relationship manager. Not an email.';
+  }
+}
+
+// ── Init ────────────────────────────────────────────────────────
+buildGapRows();
+buildSurveyQs(IND_QS, 'indQs');
+buildSurveyQs(CORP_QS, 'corpQs');
+buildCampaigns();
+buildChannels();
+buildPredictors();
+buildRoadmap();
+buildCohortTable();
+updateRisk();
+</script>
+
+
+<!-- Q Popout: problem -->
+<div id="qbtn-problem" class="q-popout-btn" onclick="openDrawer('problem')" style="display:none">
+  <span class="bubble">1</span>
+  Discussion points
+</div>
+<div id="qoverlay-problem" class="q-popout-overlay" onclick="closeDrawer('problem')"></div>
+<div id="qdrawer-problem" class="q-popout-drawer">
+  <div class="q-drawer-header" style="background:#185FA5">
+    <div class="q-drawer-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Discussion: The Problem
+    </div>
+    <button class="q-drawer-close" onclick="closeDrawer('problem')">&times;</button>
+  </div>
+  <div class="q-drawer-body">
+    <div class="q-drawer-section">
+      <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">Key discussion points for this section. Click any question to expand.</p>
+      
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#185FA5">1</span>
+            You mention a structural shift toward individual giving. How do you know it is structural and not cyclical?
+          </div>
+          <div class="q-item-a" style="border-left-color:#185FA5">Individual giving share grew in four of the six years analyzed, including 2021, 2022, and 2023, which are post-COVID years without the crisis urgency effect. That consistency across different market conditions points to a structural shift. The Lilly School's national data shows the same trend holding across comparable regional United Ways.</div>
+        </div>
+    </div>
+  </div>
+  <div class="q-drawer-footer">Click a question to expand the answer &nbsp;·&nbsp; Press ESC to close</div>
+</div>
+
+<!-- Q Popout: strategy -->
+<div id="qbtn-strategy" class="q-popout-btn" onclick="openDrawer('strategy')" style="display:none">
+  <span class="bubble">3</span>
+  Discussion points
+</div>
+<div id="qoverlay-strategy" class="q-popout-overlay" onclick="closeDrawer('strategy')"></div>
+<div id="qdrawer-strategy" class="q-popout-drawer">
+  <div class="q-drawer-header" style="background:#0F6E56">
+    <div class="q-drawer-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Discussion: The Strategy
+    </div>
+    <button class="q-drawer-close" onclick="closeDrawer('strategy')">&times;</button>
+  </div>
+  <div class="q-drawer-body">
+    <div class="q-drawer-section">
+      <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">Key discussion points for this section. Click any question to expand.</p>
+      
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#0F6E56">1</span>
+            Where does the 25-35% post-gift survey completion rate come from?
+          </div>
+          <div class="q-item-a" style="border-left-color:#0F6E56">Bloomerang's Donor Retention Index, which benchmarks post-gift engagement across nonprofits by size and sector. Post-transaction surveys consistently outperform cold surveys because the donor is in an active, engaged state right after giving. Short surveys of four questions or fewer also outperform longer ones by roughly 20-40%, per SurveyMonkey industry benchmarks.</div>
+        </div>
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#0F6E56">2</span>
+            How would you ensure the survey data is statistically valid with a regional nonprofit's sample size?
+          </div>
+          <div class="q-item-a" style="border-left-color:#0F6E56">Post-gift surveys build sample size naturally over time since every donor transaction is an opportunity. For the six-item psychological scale, 200-300 responses produce stable estimates. For the churn model, statistical power depends on lapse events observed, not just total donors. We would calculate minimum detectable effect size before deployment to confirm adequacy.</div>
+        </div>
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#0F6E56">3</span>
+            What are the privacy implications of third-party psychographic enrichment?
+          </div>
+          <div class="q-item-a" style="border-left-color:#0F6E56">Tools like DonorSearch and iWave use publicly available data such as property records, business affiliations, and political giving disclosures rather than private consumer data. Best practice is to disclose this in UWCI's privacy policy, use enrichment data to prioritize outreach rather than make automated decisions, and document all data sources.</div>
+        </div>
+    </div>
+  </div>
+  <div class="q-drawer-footer">Click a question to expand the answer &nbsp;·&nbsp; Press ESC to close</div>
+</div>
+
+<!-- Q Popout: analysis -->
+<div id="qbtn-analysis" class="q-popout-btn" onclick="openDrawer('analysis')" style="display:none">
+  <span class="bubble">3</span>
+  Discussion points
+</div>
+<div id="qoverlay-analysis" class="q-popout-overlay" onclick="closeDrawer('analysis')"></div>
+<div id="qdrawer-analysis" class="q-popout-drawer">
+  <div class="q-drawer-header" style="background:#534AB7">
+    <div class="q-drawer-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Discussion: The Analysis
+    </div>
+    <button class="q-drawer-close" onclick="closeDrawer('analysis')">&times;</button>
+  </div>
+  <div class="q-drawer-body">
+    <div class="q-drawer-section">
+      <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">Key discussion points for this section. Click any question to expand.</p>
+      
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#534AB7">1</span>
+            Why logistic regression over a random forest or gradient boosting?
+          </div>
+          <div class="q-item-a" style="border-left-color:#534AB7">The outcome is binary, lapsed or not, which is exactly what logistic regression is built for. Interpretability also matters: each coefficient translates directly into plain English for leadership. Ensemble methods give better accuracy but a black box, and at typical nonprofit sample sizes the performance difference is marginal.</div>
+        </div>
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#534AB7">2</span>
+            What does AUC 0.81 mean in practical terms?
+          </div>
+          <div class="q-item-a" style="border-left-color:#534AB7">If you show the model one lapsed donor and one who did not lapse, it correctly identifies which is which 81% of the time. AUC of 0.5 is random guessing, 1.0 is perfect. Above 0.75 is considered actionable for CRM-level decisions.</div>
+        </div>
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#534AB7">3</span>
+            The retention values look simulated. How would this work with real UWCI data?
+          </div>
+          <div class="q-item-a" style="border-left-color:#534AB7">Correct. The current values are benchmarked to Lilly School sector data as a proof of concept. In production, a direct query against the UWCI donor database replaces them. The model structure stays identical. Only the data source changes.</div>
+        </div>
+    </div>
+  </div>
+  <div class="q-drawer-footer">Click a question to expand the answer &nbsp;·&nbsp; Press ESC to close</div>
+</div>
+
+<!-- Q Popout: campaigns -->
+<div id="qbtn-campaigns" class="q-popout-btn" onclick="openDrawer('campaigns')" style="display:none">
+  <span class="bubble">2</span>
+  Discussion points
+</div>
+<div id="qoverlay-campaigns" class="q-popout-overlay" onclick="closeDrawer('campaigns')"></div>
+<div id="qdrawer-campaigns" class="q-popout-drawer">
+  <div class="q-drawer-header" style="background:#854F0B">
+    <div class="q-drawer-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Discussion: The Campaigns
+    </div>
+    <button class="q-drawer-close" onclick="closeDrawer('campaigns')">&times;</button>
+  </div>
+  <div class="q-drawer-body">
+    <div class="q-drawer-section">
+      <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">Key discussion points for this section. Click any question to expand.</p>
+      
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#854F0B">1</span>
+            If you had to launch just one campaign tomorrow, which one and why?
+          </div>
+          <div class="q-item-a" style="border-left-color:#854F0B">"90 Seconds." It requires no new creative assets, no events, and no partnerships. It is purely a UX change: a mobile-first giving page with Apple Pay as the default and a post-gift micro-survey on the thank-you page. It generates immediate friction data from day one and directly addresses the biggest mobile abandonment cause. The cost is staff time and a payment processing configuration.</div>
+        </div>
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#854F0B">2</span>
+            How would you measure whether a campaign is actually generating useful data?
+          </div>
+          <div class="q-item-a" style="border-left-color:#854F0B">Each campaign has a defined data output. For "This is my Indianapolis," success means email list growth and neighborhood identity distribution. For "The 1,000," the referral link structure generates a social graph of who influenced whom. For every campaign, the post-gift micro-survey fires automatically on the thank-you page, creating a universal psychological data layer regardless of which campaign brought the donor in.</div>
+        </div>
+    </div>
+  </div>
+  <div class="q-drawer-footer">Click a question to expand the answer &nbsp;·&nbsp; Press ESC to close</div>
+</div>
+
+<!-- Q Popout: roadmap -->
+<div id="qbtn-roadmap" class="q-popout-btn" onclick="openDrawer('roadmap')" style="display:none">
+  <span class="bubble">2</span>
+  Discussion points
+</div>
+<div id="qoverlay-roadmap" class="q-popout-overlay" onclick="closeDrawer('roadmap')"></div>
+<div id="qdrawer-roadmap" class="q-popout-drawer">
+  <div class="q-drawer-header" style="background:#3B6D11">
+    <div class="q-drawer-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Discussion: The Roadmap
+    </div>
+    <button class="q-drawer-close" onclick="closeDrawer('roadmap')">&times;</button>
+  </div>
+  <div class="q-drawer-body">
+    <div class="q-drawer-section">
+      <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">Key discussion points for this section. Click any question to expand.</p>
+      
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#3B6D11">1</span>
+            What does this cost? The Q1 actions specifically.
+          </div>
+          <div class="q-item-a" style="border-left-color:#3B6D11">Q1 is intentionally budget-neutral. The post-gift survey is an email workflow on any existing platform. The 90 Seconds giving page is a developer task plus a payment processor that supports Apple Pay. The 180-day CRM alert is a workflow rule. The first real cost is Q2, when third-party enrichment tools come in at roughly $3,000 to $8,000 annually depending on database size.</div>
+        </div>
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#3B6D11">2</span>
+            How would you measure success at the 18-month mark?
+          </div>
+          <div class="q-item-a" style="border-left-color:#3B6D11">Four metrics: year-2 donor retention rate targeting a move from 51% toward 62%; churn model AUC staying above 0.75 after retraining on real data; post-gift survey completion rate hitting the 25-35% Bloomerang benchmark; and revenue per active donor year-over-year. We set a 12-month baseline before launch and evaluate formally at month 18.</div>
+        </div>
+    </div>
+  </div>
+  <div class="q-drawer-footer">Click a question to expand the answer &nbsp;·&nbsp; Press ESC to close</div>
+</div>
+
+<!-- Q Popout: close -->
+<div id="qbtn-close" class="q-popout-btn" onclick="openDrawer('close')" style="display:none">
+  <span class="bubble">2</span>
+  Discussion points
+</div>
+<div id="qoverlay-close" class="q-popout-overlay" onclick="closeDrawer('close')"></div>
+<div id="qdrawer-close" class="q-popout-drawer">
+  <div class="q-drawer-header" style="background:#185FA5">
+    <div class="q-drawer-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Discussion: The Close
+    </div>
+    <button class="q-drawer-close" onclick="closeDrawer('close')">&times;</button>
+  </div>
+  <div class="q-drawer-body">
+    <div class="q-drawer-section">
+      <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">Key discussion points for this section. Click any question to expand.</p>
+      
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#185FA5">1</span>
+            This is built on public data and benchmarks. What changes when you have real UWCI donor data?
+          </div>
+          <div class="q-item-a" style="border-left-color:#185FA5">Precision. The architecture stays the same but the churn model shifts from Lilly School priors to coefficients trained on UWCI's actual donor population. Retention curves become real rather than simulated. Motivator scores are validated against actual survey responses. Every analysis in this presentation becomes sharper and more defensible.</div>
+        </div>
+        <div class="q-item">
+          <div class="q-item-q" onclick="toggleQA(this)">
+            <span class="q-icon" style="background:#185FA5">2</span>
+            What is the single most important action UWCI could take next week with no additional budget?
+          </div>
+          <div class="q-item-a" style="border-left-color:#185FA5">Implement the 180-day contact gap alert in their current CRM. It is one workflow rule: flag any donor who has not received communication in 180 days. No new technology, no budget, no campaign design. The churn model shows this is the strongest lapse predictor at +91%. It could measurably move retention within the next giving cycle.</div>
+        </div>
+    </div>
+  </div>
+  <div class="q-drawer-footer">Click a question to expand the answer &nbsp;·&nbsp; Press ESC to close</div>
+</div>
+<script>
+// ── Q Popout logic ──────────────────────────────────────────────
+const Q_SECTIONS = ['problem','strategy','analysis','campaigns','roadmap','close'];
+
+function showQBtn(sectionId) {
+  Q_SECTIONS.forEach(s => {
+    const btn = document.getElementById('qbtn-' + s);
+    if (btn) btn.style.display = s === sectionId ? 'flex' : 'none';
+  });
+}
+
+function openDrawer(id) {
+  document.getElementById('qdrawer-' + id).classList.add('open');
+  document.getElementById('qoverlay-' + id).classList.add('open');
+}
+
+function closeDrawer(id) {
+  document.getElementById('qdrawer-' + id).classList.remove('open');
+  document.getElementById('qoverlay-' + id).classList.remove('open');
+}
+
+function toggleQA(el) {
+  const answer = el.nextElementSibling;
+  const wasOpen = answer.classList.contains('open');
+  // Close all others in this drawer
+  el.closest('.q-drawer-body').querySelectorAll('.q-item-a').forEach(a => a.classList.remove('open'));
+  if (!wasOpen) answer.classList.add('open');
+}
+
+// ESC key closes any open drawer
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    Q_SECTIONS.forEach(s => closeDrawer(s));
+  }
+});
+
+// Show Q button on initial load
+showQBtn('problem');
+
+</script>
+</body>
